@@ -15,9 +15,9 @@ export function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Entrar</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Preencha os campos abaixo para acessar sua conta.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -27,7 +27,7 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="joao@example.com"
               required
             />
           </div>
@@ -35,22 +35,23 @@ export function LoginForm() {
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
               <Link href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
+                Esqueceu sua senha?
               </Link>
             </div>
-            <Input id="password" type="password" required />
+            <Input 
+              id="password" 
+              type="password" 
+              placeholder="********"
+              required />
           </div>
           <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
+            Entrar
           </Button>
         </div>
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
+          Não tem uma conta?{" "}
           <Link href="#" className="underline">
-            Sign up
+            Cadastre-se
           </Link>
         </div>
       </CardContent>

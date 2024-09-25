@@ -50,7 +50,7 @@ export function LoginForm() {
         </div>
         <div className="mt-4 text-center text-sm">
           Não tem uma conta?{" "}
-          <Link href="#" className="underline">
+          <Link href="/register" className="underline">
             Cadastre-se
           </Link>
         </div>

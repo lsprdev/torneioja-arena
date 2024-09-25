@@ -54,13 +54,10 @@ export function RegisterForm() {
                     <Button type="submit" className="w-full">
                         Criar conta
                     </Button>
-                    {/* <Button variant="outline" className="w-full">
-                        Login with Google
-                    </Button> */}
                 </div>
                 <div className="mt-4 text-center text-sm">
                     Já tem uma conta?{" "}
-                    <Link href="#" className="underline">
+                    <Link href="/login" className="underline">
                         Entrar
                     </Link>
                 </div>

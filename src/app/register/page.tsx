@@ -1,5 +1,5 @@
 import { RegisterForm } from "@/components/register-form"
-import { bebasNeue } from "../layout"
+import { bebasNeue } from "../fonts/fonts"
 import { CalendarDays } from "lucide-react"
 export default function Page() {
     return (

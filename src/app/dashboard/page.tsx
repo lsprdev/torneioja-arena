@@ -1,5 +1,4 @@
 'use client'
-import jwt from 'jsonwebtoken';
 import { useEffect } from 'react';
 
 export default function Page() {

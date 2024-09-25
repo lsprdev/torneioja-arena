@@ -23,7 +23,7 @@ export default function Page() {
       });
       localStorage.setItem('arena_token', response.data.token);
       // window.location.href = '/dashboard';
-    }).catch((error) => {
+    }).catch(() => {
       toast({
         variant: "destructive",
         title: 'Não foi possível efetuar o login',

@@ -13,7 +13,7 @@ export default function Page() {
     axios.post('https://api2.lspr.dev/api/login', {
       email,
       password
-    }).then((response) => {
+    }).then((response: any) => {
       console.log(response);
       toast({
         variant: "default",

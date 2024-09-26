@@ -63,7 +63,7 @@ const CalendarComponent = () => {
         <>
             {renderCalendar()}
             <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className='border border-zinc-800'>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Você ainda não tem uma conta.</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -72,11 +72,16 @@ const CalendarComponent = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel 
+                            className='border border-zinc-800 hover:bg-zinc-800 hover:text-white'
                             onClick={() => setOpen(false)}> 
                             Cancelar
                         </AlertDialogCancel>
                         <AlertDialogAction 
-                            onClick={()=> handleContinue()}>Continuar</AlertDialogAction>
+                            // add diferent styles to the button
+                            className='bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80'
+                            onClick={()=> handleContinue()}>
+                            Continuar
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

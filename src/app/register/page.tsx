@@ -45,7 +45,6 @@ export default function Page() {
                 }, 2000);
             })
             .catch((error: any) => {
-                console.error('Erro no cadastro:', error);
 
                 toast({
                     variant: "destructive",

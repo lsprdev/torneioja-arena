@@ -145,9 +145,6 @@ const CalendarComponent = () => {
                             </Table>
                         </div>
                         <div className="flex items-center justify-between">
-                            <p className="text-sm text-gray-400">
-                                {selectedRows.length} de {schedules.length} selecionados.
-                            </p>
                             <div className="space-x-2">
                                 <Button 
                                     size="sm"

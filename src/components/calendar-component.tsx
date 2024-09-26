@@ -108,7 +108,12 @@ const CalendarComponent = () => {
             {renderCalendar()}
             {isAuthenticated ? (
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent className="w-full max-w-md mx-auto space-y-4 p-4 bg-black text-white border border-zinc-800">
+                    <DialogContent 
+                        className="w-full max-w-md mx-auto space-y-4 p-4 bg-black text-white border border-zinc-800"
+                        onInteractOutside={(e) => {
+                            e.preventDefault();
+                        }}
+                        >
                         <DialogHeader>
                             <DialogTitle>Horários disponíveis</DialogTitle>
                             <DialogDescription>

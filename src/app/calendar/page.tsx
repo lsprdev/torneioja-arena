@@ -108,18 +108,22 @@ export default function Page() {
                         <div className="w-full md:w-2/3 space-y-4">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <Select value={selectedCourt} onValueChange={setSelectedCourt}>
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue placeholder="Selecione a quadra" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {courts.map((court: any) => (
-                                                <SelectItem key={court} value={court}>
-                                                    {court}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    { loading ? (
+                                        null
+                                    ) : (
+                                        <Select value={selectedCourt} onValueChange={setSelectedCourt}>
+                                            <SelectTrigger className="w-[180px]">
+                                                <SelectValue placeholder="Selecione a quadra" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {courts.map((court: any) => (
+                                                    <SelectItem key={court} value={court}>
+                                                        {court}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    )}
                                     <div className='flex ml-2 mt-3'>
                                         <p className="font-semibold mb-2">Setembro</p>
                                         <p className='ml-2'>2024</p>

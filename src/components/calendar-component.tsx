@@ -47,7 +47,11 @@ const CalendarComponent = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const arenaId = 1
-    const userId = jwtDecode(localStorage.getItem('arena_token') as string);
+    const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
+    let userId = null;
+    if(arenaToken) {
+        userId = jwtDecode(arenaToken);
+    }
 
     const handleConfirm = () => {
         const specificDate = `2024-09-${selectedDay}`;

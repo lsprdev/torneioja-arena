@@ -14,15 +14,17 @@ export default function Page() {
       email,
       password
     }).then((response: any) => {
-      console.log(response);
       toast({
         variant: "default",
         title: 'Sucesso!',
         description: 'Login efetuado com sucesso!',
         className: 'bg-green-600 text-white border-solid border-1',
       });
-      localStorage.setItem('arena_token', response.data.token);
-      // window.location.href = '/dashboard';
+      localStorage.setItem('arena_token', response.data.data.access_token);
+
+      setTimeout(() => {
+        window.location.href = '/calendar';
+      }, 2000);
     }).catch(() => {
       toast({
         variant: "destructive",

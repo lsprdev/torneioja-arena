@@ -29,24 +29,22 @@ export default function Page() {
 
                 // Atualiza o estado da arena
                 setArena(arenaResponse.data.data);
-                console.log(arenaResponse.data);
 
                 // Atualiza o estado das quadras
                 const courts = courtsResponse.data.data.map((court: any) => court.name);
                 setCourts(courts);
-                console.log(courtsResponse.data);
             } catch (error) {
                 console.error('Erro ao buscar dados:', error);
             } finally {
                 setLoading(false);
             }
         };
-
+        
         fetchData();
     }, []);
 
     return (
-        <div className='h-screen justify-center content-center'>
+        <div className='h-screen justify-center content-center '>
             <Card className="w-full max-w-4xl mx-auto">
                 <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-6">

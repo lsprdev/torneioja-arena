@@ -14,13 +14,15 @@ export default function Page() {
       email,
       password
     }).then((response: any) => {
+      const { data } = response.data;
+
       toast({
         variant: "default",
         title: 'Sucesso!',
         description: 'Login efetuado com sucesso!',
         className: 'bg-green-600 text-white border-solid border-1',
       });
-      localStorage.setItem('arena_token', response.data.data.access_token);
+      localStorage.setItem('arena_token', data.access_token);
 
       setTimeout(() => {
         window.location.href = '/calendar';

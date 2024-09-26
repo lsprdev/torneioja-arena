@@ -144,7 +144,7 @@ const CalendarComponent = () => {
                                 </TableBody>
                             </Table>
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-end">
                             <div className="space-x-2">
                                 <Button 
                                     size="sm"

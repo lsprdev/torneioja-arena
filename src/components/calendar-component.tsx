@@ -28,6 +28,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
+import convertToISO from '@/lib/convert-to-time';
+import { jwtDecode } from "jwt-decode";
 
 const schedules = [
     { id: '1', time: '08:00 - 09:00' },
@@ -44,6 +46,25 @@ const CalendarComponent = () => {
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const arenaId = 1
+    const userId = jwtDecode(localStorage.getItem('arena_token') as string);
+
+    const handleConfirm = () => {
+        const specificDate = `2024-09-${selectedDay}`;
+        console.log('Agendamento confirmado para o dia:', specificDate);
+
+        const finalList = selectedRows.map((row) => {
+            const schedule:any = schedules.find((schedule) => schedule.id === row);
+            const { initTime, endTime } = convertToISO(schedule.time, specificDate);
+            return { ...schedule, initTime, endTime };
+        });
+
+        console.log('UserId:', userId);
+        console.log('ArenaId:', arenaId);
+
+        console.log('Horários selecionados:', finalList);
+    }
+
 
     const toggleRow = (id: string) => {
         setSelectedRows((prev) =>
@@ -56,7 +77,6 @@ const CalendarComponent = () => {
             prev.length === schedules.length ? [] : schedules.map((schedule) => schedule.id)
         )
     }
-
 
     useEffect(() => {
         setIsAuthenticated(localStorage.getItem('arena_token') !== null);
@@ -142,7 +162,6 @@ const CalendarComponent = () => {
                                                     onCheckedChange={() => toggleRow(schedule.id)}
                                                 />
                                             </TableCell>
-                                          
                                             <TableCell>{schedule.time}</TableCell>
                                         </TableRow>
                                     ))}
@@ -159,6 +178,7 @@ const CalendarComponent = () => {
                                 </Button>
                                 <Button 
                                     size="sm" 
+                                    onClick={() => handleConfirm()}
                                     className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
                                     Confirmar agendamento
                                 </Button>
@@ -196,4 +216,6 @@ const CalendarComponent = () => {
     );
 };
 
+
 export default CalendarComponent;
+

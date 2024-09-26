@@ -4,34 +4,46 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MapPin, Phone, ChevronLeft, ChevronRight } from "lucide-react"
+import { MapPin, Phone, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react"
+import { bebasNeue } from '../fonts/fonts';
+import axios from 'axios';
+import { useEffect } from 'react';
+import LoaderSpinner from '@/components/loader-spinner';
+import CalendarComponent from '@/components/calendar-component';
 
-const courts = ["QUADRA 1", "QUADRA 2", "QUADRA 3", "QUADRA 4", "QUADRA 5"]
+export default function Page() {
+    const [selectedCourt, setSelectedCourt] = useState("Quadra 1")
+    const [loading, setLoading] = useState(false)
+    const [arena, setArena]:any = useState();
+    const [courts, setCourts]: any = useState([]);
 
-export default function BookingInterface() {
-    const [selectedMonth, setSelectedMonth] = useState("Quadra 1")
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                // Executa ambas as requisições em paralelo
+                const [arenaResponse, courtsResponse] = await Promise.all([
+                    axios.get('https://api2.lspr.dev/api/arenas/1'),
+                    axios.get('https://api2.lspr.dev/api/courts/arena/1')
+                ]);
 
-    const renderCalendar = () => {
-        const days = Array.from({ length: 31 }, (_, i) => i + 1)
-        const weekdays = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB']
+                // Atualiza o estado da arena
+                setArena(arenaResponse.data.data);
+                console.log(arenaResponse.data);
 
-        return (
-            <div className="grid grid-cols-7 gap-2">
-                {weekdays.map(day => (
-                    <div key={day} className="text-center font-semibold">{day}</div>
-                ))}
-                {days.map(day => (
-                    <Button
-                        key={day}
-                        variant={day >= 15 && day <= 31 ? "secondary" : "ghost"}
-                        className={`w-full bg-gray-100 pt-6 pb-6 hover:bg-gray-300`}
-                    >
-                        {day}
-                    </Button>
-                ))}
-            </div>
-        )
-    }
+                // Atualiza o estado das quadras
+                const courts = courtsResponse.data.data.map((court: any) => court.name);
+                setCourts(courts);
+                console.log(courtsResponse.data);
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div className='h-screen justify-center content-center'>
@@ -39,50 +51,77 @@ export default function BookingInterface() {
                 <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-6">
                         <div className="w-full md:w-1/3 space-y-4">
-                            <div className="flex items-center space-x-4">
-                                <img src="/beachville.png?height=50&width=50" alt="Beachville logo" className="w-12 h-12 rounded" />
-                                <div>
-                                    <h2 className="font-bold text-lg">BEACHVILLE</h2>
-                                    <p className="text-sm text-gray-600">ESPORTES DE AREIA</p>
+                            {loading ? (
+                                <div className='flex h-full justify-center items-center'>
+                                    <LoaderSpinner size="md" />
                                 </div>
-                            </div>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex items-center">
-                                    <MapPin className="w-4 h-4 mr-2" />
-                                    <p>R. Mal. Deodoro, 106 - Centro, Joinville - SC, 89201-203</p>
-                                </div>
-                                <div className="flex items-center">
-                                    <Phone className="w-4 h-4 mr-2" />
-                                    <p>(47) 99761-7568</p>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="font-semibold mb-2">QUADRAS DISPONÍVEIS</h3>
-                                <div className="space-y-2">
-                                    {courts.map(court => (
-                                        <Button key={court} variant="outline" className="w-full justify-start">
-                                            {court}
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
+                            ) : (
+                                <>
+                                    {arena && (
+                                        <div className="flex items-center space-x-4">
+                                            {arena.img ? (
+                                                <img
+                                                    src={`${arena.img}?height=50&width=50`}
+                                                    alt="Beachville logo"
+                                                    className="w-12 h-12 rounded"
+                                                />
+                                            ) : (
+                                                <LoaderSpinner size="sm" />
+                                            )}
+                                            <div>
+                                                <h2 className="font-bold text-lg">{arena.name}</h2>
+                                                <p className="text-sm text-gray-600">{arena.description}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {arena && (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex items-center">
+                                                <MapPin className="w-4 h-4 mr-2" />
+                                                <p>{arena.address}</p>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <Phone className="w-4 h-4 mr-2" />
+                                                <p>{arena.phone}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h3 className="font-semibold mb-2">QUADRAS DISPONÍVEIS</h3>
+                                        <div className="space-y-2">
+                                            {courts && courts.length > 0 ? (
+                                                courts.map((court: any) => (
+                                                    <Button key={court} variant="outline" className="w-full justify-start"
+                                                        onClick={() => setSelectedCourt(court)}
+                                                        >
+                                                        {court}
+                                                    </Button>
+                                                ))
+                                            ) : (
+                                                <p>Sem quadras disponíveis no momento.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="w-full md:w-2/3 space-y-4">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                    <Select value={selectedCourt} onValueChange={setSelectedCourt}>
                                         <SelectTrigger className="w-[180px]">
                                             <SelectValue placeholder="Selecione a quadra" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Quadra 1">Quadra 1</SelectItem>
-                                            <SelectItem value="Quadra 2">Quadra 2</SelectItem>
-                                            <SelectItem value="Quadra 3">Quadra 3</SelectItem>
-                                            <SelectItem value="Quadra 4">Quadra 4</SelectItem>
+                                            {courts.map((court: any) => (
+                                                <SelectItem key={court} value={court}>
+                                                    {court}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <div className='flex ml-2 mt-3'>
-                                        <p className="font-semibold mb-2">Agosto</p>
+                                        <p className="font-semibold mb-2">Setembro</p>
                                         <p className='ml-2'>2024</p>
                                     </div>
                                 </div>
@@ -95,11 +134,15 @@ export default function BookingInterface() {
                                     </Button>
                                 </div>
                             </div>
-                            {renderCalendar()}
+                            {CalendarComponent()}
                         </div>
                     </div>
                 </CardContent>
             </Card>
+            <span className="flex items-center justify-center my-8">
+                <CalendarDays size={29} className="text-white" />
+                <h1 className={`${bebasNeue.className} text-white text-2xl mx-1`}>Arena Já</h1>
+            </span>
         </div>
     )
 }

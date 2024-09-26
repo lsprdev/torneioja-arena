@@ -45,7 +45,7 @@ export default function Page() {
                 }, 2000);
             })
             .catch((error: any) => {
-
+                console.error('Erro ao cadastrar:', error);
                 toast({
                     variant: "destructive",
                     title: 'Não foi possível efetuar o cadastro.',

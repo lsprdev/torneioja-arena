@@ -14,9 +14,14 @@ import { bebasNeue } from "../fonts/fonts"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import moment from "moment"
+import { jwtDecode } from "jwt-decode"
 
 export default function Page() {
     const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
+    let userId: any = null;
+    if (arenaToken) {
+        userId = (jwtDecode(arenaToken) as { id: string }).id;
+    }
     interface Schedule {
         initTime: string;
         endTime: string;
@@ -32,7 +37,7 @@ export default function Page() {
     const [scheduleData, setScheduleData] = useState<Schedule[]>([])
     useEffect(() => {
         if (arenaToken) {
-            axios.get('https://api2.lspr.dev/api/schedule', {
+            axios.get(`https://api2.lspr.dev/api/schedule/user/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${arenaToken}`
                 }

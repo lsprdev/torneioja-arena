@@ -45,18 +45,20 @@ export default function Page() {
         fetchData();
     }, []);
 
-    const redirectMeusAgendamentos = () => {
-        window.location.href = '/agendamentos';
-    }
-
     return (
         <> 
-            <div className='flex w-full h-10 items-center justify-end p-9'>
+            <div className='flex w-full h-10 items-center justify-end p-9 gap-3'>
                 <Button
                     size="default"
-                    onClick={redirectMeusAgendamentos}
+                    onClick={() => window.location.href = '/agendamentos'}
                     className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
                     Meus agendamentos
+                </Button>
+                <Button
+                    size="default"
+                    onClick={() => window.location.href = '/login'}
+                    className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
+                    Login
                 </Button>
             </div>
             <div className='flex-col h-5/6 items-center justify-center p-7'>

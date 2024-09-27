@@ -15,6 +15,9 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import moment from "moment"
 import { jwtDecode } from "jwt-decode"
+import { useToast } from "@/hooks/use-toast"
+import LoaderSpinner from "@/components/loader-spinner"
+import { Button } from "@/components/ui/button"
 
 interface Schedule {
         initTime: string;
@@ -29,15 +32,17 @@ interface Schedule {
     }
 
 export default function Page() {
+    const [ loading, setLoading ] = useState(false)
+    const { toast } = useToast()
     const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
     let userId: any = null;
     if (arenaToken) {
         userId = (jwtDecode(arenaToken) as { id: string }).id;
     }
-    
-
     const [scheduleData, setScheduleData] = useState<Schedule[]>([])
+    
     useEffect(() => {
+        setLoading(true)
         if (arenaToken) {
             axios.get(`https://api2.lspr.dev/api/schedule/user/${userId}`, {
                 headers: {
@@ -45,18 +50,62 @@ export default function Page() {
                 }
             }).then(response => {
                 const { data } = response.data
+
+                if(data.status === 401) {
+                    toast({
+                        variant: "default",
+                        title: 'Ops!',
+                        description: 'Sua sessão expirou. Faça login novamente.',
+                        className: 'bg-red-600 text-white border-solid border-1',
+                    });
+                    setTimeout(() => {
+                        setLoading(false)
+                        window.localStorage.removeItem('arena_token')
+                        window.location.href = '/login';
+                    }, 2000);
+                    return;
+                }
+                setLoading(false)
                 setScheduleData(data)
-                console.log(data)
-            }).catch(error => {
-                console.log(error)
-            }).finally(() => {
-                console.log("Request finalizada")
-            })
+            }).catch(() => {
+                toast({
+                    variant: "default",
+                    title: 'Ops!',
+                    description: 'Ocorreu um erro ao buscar os agendamentos.',
+                    className: 'bg-red-600 text-white border-solid border-1',
+                });
+                setLoading(false)
+            });
+        } else {
+            toast({
+                variant: "default",
+                title: 'Ops!',
+                description: 'Você precisa estar logado para acessar essa página.',
+                className: 'bg-red-600 text-white border-solid border-1',
+            });
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
         }
     }, [])
 
     return (
-        <div className="flex h-screen w-screen items-center justify-center">
+        <>
+        <div className='flex w-full h-10 items-center justify-end p-9 gap-3'>
+            <Button
+                size="default"
+                onClick={() => window.location.href = '/calendar'}
+                className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
+                Agendar
+            </Button>
+            <Button
+                size="default"
+                onClick={() => window.location.href = '/login'}
+                className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
+                Login
+            </Button>
+        </div>
+        <div className="flex h-5/6 w-screen items-center justify-center p-7">
             <div className="flex-col w-screen">
             <Card className="w-full md:w-6/12 mx-auto">
                     <CardHeader>
@@ -76,22 +125,38 @@ export default function Page() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {
-                                    scheduleData.map((schedule, index) => {
-                                        return ( 
-                                            <>
-                                            <TableRow>
-                                                    <TableCell key={index}>{moment(schedule.initTime).format('YYYY-MM-DD')}</TableCell>
-                                                    <TableCell>{moment(schedule.initTime).format('HH:mm')}</TableCell>
-                                                    <TableCell>{moment(schedule.endTime).format('HH:mm')}</TableCell>
-                                                    <TableCell>{schedule.arena.name}</TableCell>
-                                                    <TableCell>{schedule.court.name}</TableCell>
-                                            </TableRow>
-                                            </>
+                                { loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center" >
+                                            <LoaderSpinner size="sm" />
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    <>
+                                        {
+                                            scheduleData.length === 0 && loading === false ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={5} align="center">Nenhum agendamento encontrado.</TableCell>
+                                                </TableRow>
+                                            ) :
+                                            scheduleData.map((schedule, index) => {
+                                                return ( 
+                                                    <>
+                                                    <TableRow>
+                                                            <TableCell key={index}>{moment(schedule.initTime).format('YYYY-MM-DD')}</TableCell>
+                                                            <TableCell>{moment(schedule.initTime).format('HH:mm')}</TableCell>
+                                                            <TableCell>{moment(schedule.endTime).format('HH:mm')}</TableCell>
+                                                            <TableCell>{schedule.arena.name}</TableCell>
+                                                            <TableCell>{schedule.court.name}</TableCell>
+                                                    </TableRow>
+                                                    </>
 
-                                        )
-                                    })
-                                }
+                                                )
+                                            })
+                                        }
+                                    </>
+                                )}
+
                             </TableBody>
                         </Table>
                     </CardContent>
@@ -102,6 +167,7 @@ export default function Page() {
                 </span>   
             </div>
         </div>
+        </>
     )
 
 

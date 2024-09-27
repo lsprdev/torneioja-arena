@@ -39,8 +39,9 @@ const schedules = [
     { id: '5', time: '12:00 - 13:00' }
 ]
 
-const CalendarComponent = () => {
+export default function CalendarComponent({ courtId }: any) {
     const { toast } = useToast();
+    console.log("aqui:"+courtId);
 
     const [open, setOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -48,7 +49,7 @@ const CalendarComponent = () => {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const arenaId = 1
     const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
-    let userId = null;
+    let userId: any = null;
     if(arenaToken) {
         userId = jwtDecode(arenaToken);
     }
@@ -63,8 +64,9 @@ const CalendarComponent = () => {
             return { ...schedule, initTime, endTime };
         });
 
-        console.log('UserId:', userId);
+        console.log('UserId:', userId.id);
         console.log('ArenaId:', arenaId);
+        console.log('CourtId:', courtId);
 
         console.log('Horários selecionados:', finalList);
     }
@@ -105,7 +107,6 @@ const CalendarComponent = () => {
 
         const handleClick = (day: number) => {
             setSelectedDay(day);
-            console.log(selectedDay);
             setOpen(true);
         };
 
@@ -220,6 +221,4 @@ const CalendarComponent = () => {
     );
 };
 
-
-export default CalendarComponent;
 

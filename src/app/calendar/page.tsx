@@ -12,26 +12,28 @@ import LoaderSpinner from '@/components/loader-spinner';
 import CalendarComponent from '@/components/calendar-component';
 
 export default function Page() {
-    const [selectedCourt, setSelectedCourt] = useState("Quadra 1")
     const [loading, setLoading] = useState(false)
     const [arena, setArena]:any = useState();
-    const [courts, setCourts]: any = useState([]);
+    const [selectedCourt, setSelectedCourt] = useState<{ id: string} | null>({ id: '' });
+    const [courts, setCourts] = useState<{ id: string; name: string }[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Executa ambas as requisições em paralelo
                 const [arenaResponse, courtsResponse] = await Promise.all([
                     axios.get('https://api2.lspr.dev/api/arenas/1'),
                     axios.get('https://api2.lspr.dev/api/courts/arena/1')
                 ]);
 
-                // Atualiza o estado da arena
                 setArena(arenaResponse.data.data);
 
-                // Atualiza o estado das quadras
-                const courts = courtsResponse.data.data.map((court: any) => court.name);
+                const courts = courtsResponse.data.data.map((court: any) => {
+                    return {
+                        id: court.id,
+                        name: court.name
+                    }
+                });
                 setCourts(courts);
             } catch (error) {
                 console.error('Erro ao buscar dados:', error);
@@ -89,10 +91,10 @@ export default function Page() {
                                         <div className="space-y-2">
                                             {courts && courts.length > 0 ? (
                                                 courts.map((court: any) => (
-                                                    <Button key={court} variant="outline" className="w-full justify-start"
-                                                        onClick={() => setSelectedCourt(court)}
+                                                    <Button key={court.id} variant="outline" className="w-full justify-start"
+                                                        onClick={() => setSelectedCourt({ id: court.id })}
                                                         >
-                                                        {court}
+                                                        {court.name}
                                                     </Button>
                                                 ))
                                             ) : (
@@ -106,17 +108,22 @@ export default function Page() {
                         <div className="w-full md:w-2/3 space-y-4">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    { loading ? (
+                                    { loading || !selectedCourt ? (
                                         null
                                     ) : (
-                                        <Select value={selectedCourt} onValueChange={setSelectedCourt}>
+                                            <Select value={selectedCourt.id} onValueChange={(value) => {
+                                                const selected = courts.find((court) => court.id === value)?.id;
+                                                if (selected) {
+                                                    setSelectedCourt({ id: selected });
+                                                }
+                                            }}>
                                             <SelectTrigger className="w-[180px]">
                                                 <SelectValue placeholder="Selecione a quadra" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {courts.map((court: any) => (
-                                                    <SelectItem key={court} value={court}>
-                                                        {court}
+                                                    <SelectItem key={court.name} value={court.id}>
+                                                        {court.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -136,7 +143,9 @@ export default function Page() {
                                     </Button>
                                 </div>
                             </div>
-                            {CalendarComponent()}
+                            {<CalendarComponent
+                                courtId={selectedCourt?.id}
+                            />}
                         </div>
                     </div>
                 </CardContent>

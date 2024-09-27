@@ -16,13 +16,7 @@ import { useEffect, useState } from "react"
 import moment from "moment"
 import { jwtDecode } from "jwt-decode"
 
-export default function Page() {
-    const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
-    let userId: any = null;
-    if (arenaToken) {
-        userId = (jwtDecode(arenaToken) as { id: string }).id;
-    }
-    interface Schedule {
+interface Schedule {
         initTime: string;
         endTime: string;
         date: string;
@@ -33,6 +27,14 @@ export default function Page() {
             name: string;
         };
     }
+
+export default function Page() {
+    const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
+    let userId: any = null;
+    if (arenaToken) {
+        userId = (jwtDecode(arenaToken) as { id: string }).id;
+    }
+    
 
     const [scheduleData, setScheduleData] = useState<Schedule[]>([])
     useEffect(() => {
@@ -48,7 +50,7 @@ export default function Page() {
             }).catch(error => {
                 console.log(error)
             }).finally(() => {
-                console.log('finalizado')
+                console.log("Request finalizada")
             })
         }
     }, [])

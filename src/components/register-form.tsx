@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import LoaderSpinner from "./loader-spinner"
 
-export function RegisterForm({ handleSubmit, loding }: { handleSubmit: (formData: any) => void, loding: boolean }) {
+export function RegisterForm({ handleSubmit, loading }: { handleSubmit: (formData: any) => void, loading: boolean }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -68,7 +68,7 @@ export function RegisterForm({ handleSubmit, loding }: { handleSubmit: (formData
                             required />
                     </div>
                     <Button type="submit" className="w-full">
-                        {loding ? <LoaderSpinner color="accent" size="sm"/> : "Criar conta"}
+                        {loading ? <LoaderSpinner color="accent" size="sm"/> : "Criar conta"}
                     </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">

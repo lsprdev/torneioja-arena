@@ -31,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import convertToISO from '@/lib/convert-to-time';
 import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
+import LoaderSpinner from './loader-spinner';
 
 const schedules = [
     { id: '1', time: '08:00 - 09:00' },
@@ -43,6 +44,7 @@ const schedules = [
 export default function CalendarComponent({ courtId }: any) {
     const { toast } = useToast();
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [selectedRows, setSelectedRows] = useState<string[]>([])
@@ -55,8 +57,7 @@ export default function CalendarComponent({ courtId }: any) {
 
     const handleConfirm = () => {
         const specificDate = `2024-09-${selectedDay}`;
-        console.log('Agendamento confirmado para o dia:', specificDate);
-
+        setLoading(true);
         const finalList = selectedRows.map((row) => {
             const schedule:any = schedules.find((schedule) => schedule.id === row);
             const { initTime, endTime } = convertToISO(schedule.time, specificDate);
@@ -73,29 +74,46 @@ export default function CalendarComponent({ courtId }: any) {
                     endTime: finalList[i].endTime
                 }
 
-                try {
                     axios.post('https://api2.lspr.dev/api/schedule', data, {
                         headers: {
                             'Authorization': `Bearer ${arenaToken}`
                         }
+                    }).then((response: any) => {
+                        const { data } = response.data;
+
+                        if (data.status === 401) {
+                            setOpen(false);
+                            toast({
+                                variant: "default",
+                                title: 'Ops!',
+                                description: 'Sua sessão expirou. Faça login novamente.',
+                                className: 'bg-red-600 text-white border-solid border-1',
+                            });
+                            setTimeout(() => {
+                                setLoading(false);
+                                window.location.href = '/login';
+                            }, 2000);
+                            return;
+                        }
+
+                        setOpen(false);
+                        setLoading(false);
+                        toast({
+                            variant: "default",
+                            title: 'Sucesso!',
+                            description: 'Agendamento realizado com sucesso.',
+                            className: 'bg-green-600 text-white border-solid border-1',
+                        });
+                    }).catch(() => {
+                        setLoading(false);
+                        setOpen(false);
+                        toast({
+                            variant: "default",
+                            title: 'Ops!',
+                            description: 'Erro ao agendar. Tente novamente.',
+                            className: 'bg-red-600 text-white border-solid border-1',
+                        });
                     });
-                } catch (error) {
-                    console.error('Erro ao agendar:', error );
-                    toast({
-                        variant: "default",
-                        title: 'Ops!',
-                        description: 'Erro ao agendar. Tente novamente.',
-                        className: 'bg-red-600 text-white border-solid border-1',
-                    });
-                } finally {
-                    setOpen(false);
-                    toast({
-                        variant: "default",
-                        title: 'Sucesso!',
-                        description: 'Agendamento realizado com sucesso.',
-                        className: 'bg-green-600 text-white border-solid border-1',
-                    });
-                }
             }
         }
 
@@ -231,7 +249,7 @@ export default function CalendarComponent({ courtId }: any) {
                                     size="sm" 
                                     onClick={() => handleConfirm()}
                                     className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
-                                    Confirmar agendamento
+                                    {loading ? <LoaderSpinner size="sm" /> : 'Confirmar agendamento'}
                                 </Button>
                             </div>
                         </div>

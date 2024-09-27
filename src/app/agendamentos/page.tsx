@@ -1,4 +1,4 @@
-
+'use client'
 import {
     Table,
     TableHeader,
@@ -11,8 +11,43 @@ import {
 import { Card, CardContent, CardTitle, CardDescription, CardHeader } from "@/components/ui/card"
 import { CalendarDays } from "lucide-react"
 import { bebasNeue } from "../fonts/fonts"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import moment from "moment"
 
 export default function Page() {
+    const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
+    interface Schedule {
+        initTime: string;
+        endTime: string;
+        date: string;
+        arena: {
+            name: string;
+        };
+        court: {
+            name: string;
+        };
+    }
+
+    const [scheduleData, setScheduleData] = useState<Schedule[]>([])
+    useEffect(() => {
+        if (arenaToken) {
+            axios.get('https://api2.lspr.dev/api/schedule', {
+                headers: {
+                    'Authorization': `Bearer ${arenaToken}`
+                }
+            }).then(response => {
+                const { data } = response.data
+                setScheduleData(data)
+                console.log(data)
+            }).catch(error => {
+                console.log(error)
+            }).finally(() => {
+                console.log('finalizado')
+            })
+        }
+    }, [])
+
     return (
         <div className="flex h-screen w-screen items-center justify-center">
             <div className="flex-col w-screen">
@@ -27,18 +62,29 @@ export default function Page() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Data</TableHead>
-                                    <TableHead>Horário</TableHead>
+                                    <TableHead>Horário Início</TableHead>
+                                    <TableHead>Horário Fim</TableHead>
                                     <TableHead>Arena</TableHead>
                                     <TableHead>Quadra</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell>10/10/2021</TableCell>
-                                    <TableCell>19:00</TableCell>
-                                    <TableCell>Arena 1</TableCell>
-                                    <TableCell>Quadra 1</TableCell>
-                                </TableRow>
+                                {
+                                    scheduleData.map((schedule, index) => {
+                                        return ( 
+                                            <>
+                                            <TableRow>
+                                                    <TableCell key={index}>{moment(schedule.initTime).format('YYYY-MM-DD')}</TableCell>
+                                                    <TableCell>{moment(schedule.initTime).format('HH:mm')}</TableCell>
+                                                    <TableCell>{moment(schedule.endTime).format('HH:mm')}</TableCell>
+                                                    <TableCell>{schedule.arena.name}</TableCell>
+                                                    <TableCell>{schedule.court.name}</TableCell>
+                                            </TableRow>
+                                            </>
+
+                                        )
+                                    })
+                                }
                             </TableBody>
                         </Table>
                     </CardContent>

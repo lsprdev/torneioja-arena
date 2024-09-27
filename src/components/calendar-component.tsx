@@ -30,6 +30,7 @@ import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
 import convertToISO from '@/lib/convert-to-time';
 import { jwtDecode } from "jwt-decode";
+import axios from 'axios';
 
 const schedules = [
     { id: '1', time: '08:00 - 09:00' },
@@ -41,8 +42,6 @@ const schedules = [
 
 export default function CalendarComponent({ courtId }: any) {
     const { toast } = useToast();
-    console.log("aqui:"+courtId);
-
     const [open, setOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,7 +50,7 @@ export default function CalendarComponent({ courtId }: any) {
     const arenaToken = typeof window !== "undefined" ? window.localStorage.getItem('arena_token') : false;
     let userId: any = null;
     if(arenaToken) {
-        userId = jwtDecode(arenaToken);
+        userId = (jwtDecode(arenaToken) as { id: string }).id;
     }
 
     const handleConfirm = () => {
@@ -64,7 +63,45 @@ export default function CalendarComponent({ courtId }: any) {
             return { ...schedule, initTime, endTime };
         });
 
-        console.log('UserId:', userId.id);
+        if (finalList && userId && arenaId && courtId) {
+            for (let i = 0; i < finalList.length; i++) {
+                const data = {
+                    userId,
+                    arenaId,
+                    courtId,
+                    initTime: finalList[i].initTime,
+                    endTime: finalList[i].endTime
+                }
+
+                try {
+                    axios.post('https://api2.lspr.dev/api/schedule', data, {
+                        headers: {
+                            'Authorization': `Bearer ${arenaToken}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Erro ao agendar:', error );
+                    toast({
+                        variant: "default",
+                        title: 'Ops!',
+                        description: 'Erro ao agendar. Tente novamente.',
+                        className: 'bg-red-600 text-white border-solid border-1',
+                    });
+                } finally {
+                    setOpen(false);
+                    toast({
+                        variant: "default",
+                        title: 'Sucesso!',
+                        description: 'Agendamento realizado com sucesso.',
+                        className: 'bg-green-600 text-white border-solid border-1',
+                    });
+                }
+            }
+        }
+
+
+
+        console.log('UserId:', userId);
         console.log('ArenaId:', arenaId);
         console.log('CourtId:', courtId);
 
@@ -106,8 +143,17 @@ export default function CalendarComponent({ courtId }: any) {
         const weekdays = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
 
         const handleClick = (day: number) => {
-            setSelectedDay(day);
-            setOpen(true);
+            if (courtId) {
+                setSelectedDay(day);
+                setOpen(true);
+                return;
+            }
+            toast({
+                variant: "default",
+                title: 'Ops!',
+                description: 'Selecione uma quadra para continuar.',
+                className: 'bg-red-600 text-white border-solid border-1',
+            });
         };
 
         return (

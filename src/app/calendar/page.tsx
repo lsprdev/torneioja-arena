@@ -46,7 +46,15 @@ export default function Page() {
     }, []);
 
     return (
-        <div className='h-screen justify-center content-center '>
+        <> 
+            <div className='flex w-full h-10 items-center justify-end p-9'>
+                <Button
+                    size="default"
+                    className="bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80">
+                    Meus agendamentos
+                </Button>
+            </div>
+            <div className='flex-col h-5/6 items-center justify-center p-7'>
             <Card className="w-full max-w-4xl mx-auto">
                 <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-6">
@@ -155,5 +163,6 @@ export default function Page() {
                 <h1 className={`${bebasNeue.className} text-white text-2xl mx-1`}>Arena Já</h1>
             </span>
         </div>
+        </>
     )
 }
